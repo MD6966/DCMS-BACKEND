@@ -48,6 +48,8 @@ exports.loginUser = catchAsyncError(async(req,res,next) => {
     })
 })
 
+// Get All users from DB
+
 exports.getUsers = catchAsyncError(async (req, res, next) => {
     const users = await User.find();
 
@@ -56,3 +58,57 @@ exports.getUsers = catchAsyncError(async (req, res, next) => {
         users,
     });
 });
+
+//Gwt Single User
+
+exports.getSingleUser = catchAsyncError(async (req,res,next)=> {
+    const userId = req.params.id;
+    const user = await User.findById(userId);
+    if (!user) {
+        return next(new ErrorHandler('User not found', 404));
+    }
+      res.status(200).json({
+        success: true,
+        user,
+    });
+
+})
+
+//Update user details
+
+exports.updateDetails = catchAsyncError(async(req,res,next)=> {
+    const userId = req.params.id;
+    const user = await User.findById(userId);
+    if (!user) {
+        return next(new ErrorHandler('User not found', 404));
+    }
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+    user.residence = req.body.residence || user.residence;
+    user.contact = req.body.contact || user.contact;
+    user.behavior = req.body.behavior || user.behavior;
+
+    await user.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'User updated successfully',
+        user,
+    });
+})
+
+
+// Delete A user 
+
+exports.deleteUser = catchAsyncError(async (req,res,next)=> {
+    const userId = req.params.id;
+    const user = await User.findById(userId);
+    if (!user) {
+        return next(new ErrorHandler('User not found', 404));
+    }
+    await user.deleteOne();
+    res.status(200).json({
+        success: true,
+        message: 'User deleted successfully',
+    });
+})
