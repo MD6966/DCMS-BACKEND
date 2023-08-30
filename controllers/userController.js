@@ -5,21 +5,16 @@ const ErrorHandler = require('../utils/errorhandler');
 
 exports.newUser =catchAsyncError( async (req, res, next) => {
     try {
-        const {name, email, password} = req.body;
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({ email: req.body.email });
         if(existingUser) {
         return next(new ErrorHandler('Email already exist', 400))
 
         }
-        const user = await User.create({
-            name,
-            email,
-            password,
-        });
+        const user = await User.create(req.body);
         const token = user.getJwtToken()
         res.status(201).json({
             success: true,
-            token
+            message: 'User Created Successfully'
         });
     } catch (error) {
       
@@ -53,9 +48,11 @@ exports.loginUser = catchAsyncError(async(req,res,next) => {
     })
 })
 
-exports.getUsers = (req, res, next) => {
+exports.getUsers = catchAsyncError(async (req, res, next) => {
+    const users = await User.find();
+
     res.status(200).json({
         success: true,
-        message: "This is dummy route"
-    })
-}
+        users,
+    });
+});
