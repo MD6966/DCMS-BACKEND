@@ -1,6 +1,49 @@
 const User = require('../models/user')
 const catchAsyncError = require('../middlewares/catchAsyncError');
 const ErrorHandler = require('../utils/errorhandler');
+const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config({
+    cloud_name : process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_SECRET
+  });
+
+  exports.updateAvatar = catchAsyncError(async (req, res, next) => {
+    console.log(req.file)
+    try {
+      const user = await User.findById(req.params.id);
+      if (!user) {
+        return next(new ErrorHandler('User not found', 404));
+      }
+  
+      if (!req.file) {
+        return next(new ErrorHandler('Avatar file missing', 400));
+      }
+  
+      // Upload avatar to Cloudinary
+      const result = await cloudinary.uploader.upload(req.file.buffer);
+  
+      // Update user's avatar fields
+      user.avatar = {
+        public_id: result.public_id,
+        url: result.secure_url,
+      };
+  
+      await user.save();
+  
+      res.status(200).json({
+        success: true,
+        message: 'Avatar updated successfully',
+        avatar: user.avatar,
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+
 // Create New User
 
 exports.newUser =catchAsyncError( async (req, res, next) => {
@@ -10,6 +53,7 @@ exports.newUser =catchAsyncError( async (req, res, next) => {
         return next(new ErrorHandler('Email already exist', 400))
 
         }
+
         const user = await User.create(req.body);
         const token = user.getJwtToken()
         res.status(201).json({
@@ -43,7 +87,8 @@ exports.loginUser = catchAsyncError(async(req,res,next) => {
     const token = user.getJwtToken();
     res.status(200).json({
         success: true,
-        token
+        token,
+        user
 
     })
 })
@@ -112,3 +157,6 @@ exports.deleteUser = catchAsyncError(async (req,res,next)=> {
         message: 'User deleted successfully',
     });
 })
+
+
+
