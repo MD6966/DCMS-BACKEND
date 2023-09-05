@@ -227,3 +227,29 @@ exports.resetPassword = catchAsyncError(async (req,res,next) => {
     sendToken(user, 200, res)
 
 })
+
+//update user password
+
+exports.updatePassword = catchAsyncError(async (req, res, next) => {
+    try {
+      const { currentPassword, newPassword, confirmPassword } = req.body;
+      const user = await User.findById(req.params.id).select('+password');
+      const isPassowrdMatched = await user.comparePassword(currentPassword)
+      if(!isPassowrdMatched) {
+        return(next(new ErrorHandler('Current Password is invalid', 401)))
+    }
+      if (newPassword !== confirmPassword) {
+        return next(new ErrorHandler('New password and confirm password do not match', 400));
+      }
+      user.password = newPassword;
+      await user.save();
+  
+      res.status(200).json({
+        success: true,
+        message: 'Password updated successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  

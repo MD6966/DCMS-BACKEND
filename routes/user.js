@@ -3,7 +3,7 @@ const router = express.Router()
 const multer = require('multer');
 const upload = multer(); 
 
-const {newUser, getUsers, loginUser, deleteUser, getSingleUser, updateDetails, updateAvatar, forgotPassword, resetPassword} = require('../controllers/userController')
+const {newUser, getUsers, loginUser, deleteUser, getSingleUser, updateDetails, updateAvatar, forgotPassword, resetPassword, updatePassword} = require('../controllers/userController')
 
 router.route('/users').get(getUsers)
 router.route('/user/delete/:id').delete(deleteUser)
@@ -13,6 +13,7 @@ router.route('/user/new').post(newUser)
 router.route('/user/login').post(loginUser)
 router.post('/user/upload-avatar/:id', upload.single('image'), updateAvatar);
 router.route('/password/forgot').post(forgotPassword)
+router.route('/password/update/:id').put(updatePassword)
 router.route('/password/reset/:token').put(resetPassword)
 
 
