@@ -3,6 +3,11 @@ const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
+
+const behaviorSchema = new mongoose.Schema({
+    
+})
+
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -26,9 +31,7 @@ const userSchema = new mongoose.Schema({
     contact: {
         type: String
     },
-    behavior: {
-        type: String
-    },
+    behavior: [],
     createdAt : {
         type: Date,
         default: Date.now

@@ -253,3 +253,28 @@ exports.updatePassword = catchAsyncError(async (req, res, next) => {
     }
   });
   
+
+  // Update Behavior
+
+  exports.updateBehavior = catchAsyncError(async(req,res,next)=> {
+    try{
+        const userId = req.params.id;
+        const user = await User.findById(userId);
+        if (!user) {
+            return next(new ErrorHandler('User not found', 404));
+          }
+          const newBehavior = req.body.behavior;
+          user.behavior.push(newBehavior);
+          await user.save();
+          res.status(200).json({
+            success: true,
+            message: 'User behavior updated successfully',
+            user: user,
+          });
+
+
+    }
+    catch(err) {
+        console.log(err)
+    }
+  })

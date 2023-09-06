@@ -2,6 +2,7 @@ const express = require ('express')
 const app = express()
 const cors = require('cors'); 
 const users = require('./routes/user')
+const behavior = require('./routes/behavior')
 const errorMiddleware = require('./middlewares/errors')
 const bodyparser = require('body-parser')
 const cloudinary = require('cloudinary')
@@ -19,6 +20,7 @@ cloudinary.config({
 })
 
 app.use('/api/v1', users)
+app.use('/api/v1', behavior )
 app.use(errorMiddleware)
 
 module.exports = app
